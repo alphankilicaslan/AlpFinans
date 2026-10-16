@@ -1,0 +1,13 @@
+Veriler_ve_Faturalar/
+1_kisisel_finans_ve_vergi/
+bin_release/
+AlpFinans_CS/bin/
+AlpFinans_CS/obj/
+*.db
+*.sqlite
+*.sqlite3
+AlpFinans_Python_Old.exe
+*.exe
+*.dll
+.vs/
+__pycache__/

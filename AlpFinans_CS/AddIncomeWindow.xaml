@@ -1,0 +1,99 @@
+<Window x:Class="AlpFinans.AddIncomeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Yeni Gelir / Hakediş Ekle"
+        Height="540" Width="600"
+        WindowStartupLocation="CenterOwner"
+        Background="#0B0F17" Foreground="#F8FAFC"
+        FontFamily="Segoe UI, Inter" ResizeMode="NoResize">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="💰 Yeni Gelir / Hakediş Kaydı" FontSize="18" FontWeight="Bold" Foreground="#10B981" Margin="0,0,0,20"/>
+
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="Gelir Başlığı / İş Açıklaması *" Foreground="#94A3B8" Margin="0,0,0,6"/>
+            <TextBox x:Name="TxtTitle" Height="36" Background="#131B2A" Foreground="#F8FAFC" BorderBrush="#334155" Padding="8,6" Margin="0,0,0,12"/>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Margin="0,0,8,0">
+                    <TextBlock Text="Gelir Türü" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                    <ComboBox x:Name="CmbSourceType" Height="36" Background="#131B2A" Foreground="#F8FAFC" SelectedIndex="0">
+                        <ComboBoxItem Content="Şirket Faturası (Ticari)" Tag="sirket_fatura"/>
+                        <ComboBoxItem Content="Villa Hakedişi" Tag="villa_hakedis"/>
+                        <ComboBoxItem Content="Serbest Meslek Makbuzu (SMM)" Tag="serbest_meslek"/>
+                        <ComboBoxItem Content="Maaş / Bireysel Gelir" Tag="maas"/>
+                        <ComboBoxItem Content="Diğer Gelir" Tag="diger"/>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                    <TextBlock Text="Müşteri / Firma Adı" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                    <TextBox x:Name="TxtClient" Height="36" Background="#131B2A" Foreground="#F8FAFC" BorderBrush="#334155" Padding="8,6"/>
+                </StackPanel>
+            </Grid>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Margin="0,0,8,0">
+                    <TextBlock Text="Toplam Brüt Tutar (₺) *" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                    <TextBox x:Name="TxtGross" Height="36" Background="#131B2A" Foreground="#F8FAFC" BorderBrush="#334155" Padding="8,6" TextChanged="CalculateNet_Event"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="4,0,4,0">
+                    <TextBlock Text="KDV Oranı" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                    <ComboBox x:Name="CmbKdv" Height="36" Background="#131B2A" Foreground="#F8FAFC" SelectedIndex="0" SelectionChanged="CalculateNet_Event">
+                        <ComboBoxItem Content="%20 KDV" Tag="20"/>
+                        <ComboBoxItem Content="%10 KDV" Tag="10"/>
+                        <ComboBoxItem Content="%1 KDV" Tag="1"/>
+                        <ComboBoxItem Content="%0 KDV" Tag="0"/>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Margin="8,0,0,0">
+                    <TextBlock Text="Stopaj Oranı" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                    <ComboBox x:Name="CmbStopaj" Height="36" Background="#131B2A" Foreground="#F8FAFC" SelectedIndex="0" SelectionChanged="CalculateNet_Event">
+                        <ComboBoxItem Content="%0 Yok" Tag="0"/>
+                        <ComboBoxItem Content="%20 Stopaj" Tag="20"/>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Margin="0,0,8,0">
+                    <TextBlock Text="Tarih" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                    <DatePicker x:Name="DpDate" Height="36" Background="#131B2A" Foreground="#F8FAFC"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                    <TextBlock Text="Fatura No" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                    <TextBox x:Name="TxtInvoiceNo" Height="36" Background="#131B2A" Foreground="#F8FAFC" BorderBrush="#334155" Padding="8,6"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Live Calculation Summary -->
+            <Border Background="#131B2A" BorderBrush="#1E293B" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,4,0,0">
+                <Grid>
+                    <TextBlock x:Name="TxtNetCalcDisplay" Text="Hesaplanan Net Tahsilat: ₺0.00" FontWeight="SemiBold" Foreground="#34D399"/>
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="İptal" Width="100" Height="36" Background="#1E293B" Foreground="#94A3B8" BorderThickness="0" Margin="0,0,10,0" Cursor="Hand" Click="BtnCancel_Click"/>
+            <Button Content="💾 Geliri Kaydet" Width="140" Height="36" Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Click="BtnSave_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

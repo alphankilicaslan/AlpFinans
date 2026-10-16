@@ -1,0 +1,73 @@
+<Window x:Class="AlpFinans.SimulatorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Vergi Simülatörü"
+        Height="550" Width="680"
+        WindowStartupLocation="CenterOwner"
+        Background="#0B0F17" Foreground="#F8FAFC"
+        FontFamily="Segoe UI, Inter" ResizeMode="NoResize">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="⚡ Akıllı Vergi &amp; Kâr Simülatörü" FontSize="18" FontWeight="Bold" Foreground="#8B5CF6" Margin="0,0,0,20"/>
+
+        <StackPanel Grid.Row="1">
+            <Grid Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock Text="Tahmini Brüt Gelir / Ciro (₺)" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                    <TextBox x:Name="TxtSimGross" Height="36" Background="#131B2A" Foreground="#F8FAFC" BorderBrush="#334155" Padding="8,6" Text="500000" TextChanged="Simulate_Event"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                    <TextBlock Text="Tahmini Giderler (Faturalar ₺)" Foreground="#94A3B8" Margin="0,0,0,6"/>
+                    <TextBox x:Name="TxtSimExpenses" Height="36" Background="#131B2A" Foreground="#F8FAFC" BorderBrush="#334155" Padding="8,6" Text="150000" TextChanged="Simulate_Event"/>
+                </StackPanel>
+            </Grid>
+
+            <CheckBox x:Name="ChkSimYoung" IsChecked="True" Content="Genç Girişimci İstisnası Dahil Edilsin (₺230.000 Muafiyet)" Foreground="#F8FAFC" FontSize="13" Margin="0,0,0,20" Click="Simulate_Event"/>
+
+            <!-- Result Cards -->
+            <Border Background="#131B2A" BorderBrush="#1E293B" BorderThickness="1" CornerRadius="12" Padding="20">
+                <StackPanel>
+                    <TextBlock Text="📊 Simülasyon Sonuçları" FontWeight="Bold" FontSize="14" Foreground="#A78BFA" Margin="0,0,0,14"/>
+
+                    <Grid Margin="0,0,0,10">
+                        <TextBlock Text="KDV Dengesi (Tahmini):" Foreground="#94A3B8"/>
+                        <TextBlock x:Name="TxtSimKdv" Text="₺0.00" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#38BDF8"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <TextBlock Text="Vergiye Tabi Net Matrah:" Foreground="#94A3B8"/>
+                        <TextBlock x:Name="TxtSimMatrah" Text="₺0.00" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#F8FAFC"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <TextBlock Text="Ödenecek Gelir Vergisi:" Foreground="#94A3B8"/>
+                        <TextBlock x:Name="TxtSimTax" Text="₺0.00" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#F87171"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <TextBlock Text="Faturaların Kazandırdığı Tasarruf:" Foreground="#94A3B8"/>
+                        <TextBlock x:Name="TxtSimShield" Text="₺0.00" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#F59E0B"/>
+                    </Grid>
+
+                    <Separator Background="#1E293B" Margin="0,6,0,12"/>
+
+                    <Grid>
+                        <TextBlock Text="Cebinize Kalan Net Nakit:" FontSize="15" FontWeight="Bold" Foreground="#34D399"/>
+                        <TextBlock x:Name="TxtSimPocket" Text="₺0.00" HorizontalAlignment="Right" FontSize="18" FontWeight="Bold" Foreground="#34D399"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <Button Grid.Row="2" Content="Kapat" Width="100" Height="36" Background="#1E293B" Foreground="#94A3B8" BorderThickness="0" HorizontalAlignment="Right" Margin="0,16,0,0" Cursor="Hand" Click="BtnClose_Click"/>
+    </Grid>
+</Window>
