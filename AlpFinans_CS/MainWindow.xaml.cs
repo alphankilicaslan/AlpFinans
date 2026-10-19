@@ -14,6 +14,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using UglyToad.PdfPig;
+using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using PDFtoImage;
 using AlpFinans.Models;
 using AlpFinans.Services;
@@ -35,8 +41,95 @@ public partial class MainWindow : Window
         Loaded += MainWindow_Loaded;
     }
 
-    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    private static string GetAlpTogetherDeviceHwid()
     {
+        try
+        {
+            string raw = $"ALPTOGETHER_SALT_2026_DEV_{Environment.MachineName.ToUpperInvariant()}_{Environment.UserName.ToUpperInvariant()}";
+            byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(raw));
+            string hex = Convert.ToHexString(hash);
+            return $"AT-{hex[..4]}-{hex[4..8]}-{hex[8..12]}-{hex[12..16]}";
+        }
+        catch
+        {
+            return "AT-UNKNOWN";
+        }
+    }
+
+    private static bool IsPrimaryDevMachine()
+    {
+        try
+        {
+            string machine = Environment.MachineName;
+            string user = Environment.UserName;
+            if (machine.Contains("MONSTER", StringComparison.OrdinalIgnoreCase) ||
+                machine.Contains("ALPHAN", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (user.Contains("Alphan", StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+        catch { }
+        return false;
+    }
+
+    private async Task<bool> CheckCloudWhitelistAsync()
+    {
+        if (IsPrimaryDevMachine()) return true;
+
+        try
+        {
+            string hwid = GetAlpTogetherDeviceHwid();
+            string firebaseUrl = $"https://alpnet-d0bc4-default-rtdb.europe-west1.firebasedatabase.app/alptogether/users/{hwid}.json?auth=ExNWZwF2CkByKFILhfQ2BbTpuxYFlFAUO8quWwfc";
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(6));
+            using var http = new HttpClient();
+            var resp = await http.GetAsync(firebaseUrl, cts.Token);
+            if (!resp.IsSuccessStatusCode) return false;
+
+            string json = await resp.Content.ReadAsStringAsync();
+            if (string.IsNullOrWhiteSpace(json) || json == "null") return false;
+
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            if (root.TryGetProperty("appPermissions", out var perms) &&
+                perms.TryGetProperty("alpfinans", out var finansPerm))
+            {
+                bool hasAccess = finansPerm.TryGetProperty("hasAccess", out var acc) && acc.GetBoolean();
+                if (hasAccess)
+                {
+                    string expiresAt = finansPerm.TryGetProperty("expiresAt", out var exp) ? exp.GetString() ?? "" : "";
+                    int durationDays = finansPerm.TryGetProperty("durationDays", out var dur) ? dur.GetInt32() : 0;
+                    if (durationDays >= 9999 || expiresAt.StartsWith("9999"))
+                        return true;
+
+                    if (DateTime.TryParse(expiresAt, out DateTime expDate))
+                    {
+                        if (DateTime.Now <= expDate) return true;
+                    }
+                }
+            }
+        }
+        catch { }
+        return false;
+    }
+
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        bool isWhitelisted = await CheckCloudWhitelistAsync();
+        if (!isWhitelisted)
+        {
+            string hwid = GetAlpTogetherDeviceHwid();
+            MessageBox.Show(
+                "⛔ AlpFinans Bulut Whitelist Doğrulanamadı!\n\n" +
+                "Bu bilgisayar için aktif bir AlpFinans kullanım yetkisi bulunamadı veya süresi dolmuş.\n\n" +
+                "Lütfen AlpTogether üzerinden yetkinizi kontrol ediniz veya yönetici (Alphan) ile iletişime geçiniz.\n\n" +
+                $"Cihaz HWID: {hwid}",
+                "Kullanım İzni Gerekli", MessageBoxButton.OK, MessageBoxImage.Warning);
+            Application.Current.Shutdown();
+            return;
+        }
+
         SwitchView("dashboard");
         LoadAllData();
     }

@@ -8,6 +8,9 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>AlpFinans</AssemblyName>
     <Product>AlpFinans</Product>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
     <ApplicationIcon>Assets\app_icon.ico</ApplicationIcon>
     <PublishSingleFile>true</PublishSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
